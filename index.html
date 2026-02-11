@@ -44,7 +44,7 @@ body{
     padding:25px;
 }
 
-input{
+input, button{
     width:100%;
     padding:14px;
     margin-bottom:15px;
@@ -61,10 +61,7 @@ input:focus{
 }
 
 button{
-    width:100%;
-    padding:14px;
     border:none;
-    border-radius:10px;
     background:#2a5298;
     color:white;
     font-size:15px;
@@ -157,6 +154,13 @@ button:hover{
     color:#999;
     margin-top:20px;
 }
+
+/* Hide copy button on mobile for Receiver */
+@media (max-width:768px){
+    #v_name + .copy-btn{
+        display:none;
+    }
+}
 </style>
 </head>
 
@@ -173,7 +177,7 @@ Payment Request
 <!-- Generator -->
 <div id="generator">
 
-<input type="text" id="name" placeholder="Receiver Name">
+<input type="text" id="name" placeholder="Receiver">
 <input type="text" id="upi" placeholder="UPI ID">
 <input type="number" id="amount" placeholder="Amount (₹)" min="1">
 
@@ -210,11 +214,14 @@ Payment Request Generated Successfully
 </span>
 </div>
 
+<div class="row">
+<span>Transaction ID</span>
+<input type="text" id="txn_input" placeholder="Enter Transaction ID">
 </div>
 
-<div class="txn">
-Transaction ID: <strong id="txn_id"></strong>
 </div>
+
+<button onclick="submitPayment()">Submit</button>
 
 <div class="footer">
 Secure Payment Request Interface
@@ -236,20 +243,13 @@ function generateLink(){
         return;
     }
 
-    let txn = generateTxnID();
-
     let url=window.location.origin+window.location.pathname+
     "?name="+encodeURIComponent(name)+
     "&upi="+encodeURIComponent(upi)+
-    "&amount="+encodeURIComponent(amount)+
-    "&txn="+txn;
+    "&amount="+encodeURIComponent(amount);
 
     document.getElementById("result").innerHTML=
     "<div class='link-box'>"+url+"</div>";
-}
-
-function generateTxnID(){
-    return "TXN" + Date.now() + Math.floor(Math.random()*1000);
 }
 
 function loadPayment(){
@@ -262,7 +262,6 @@ function loadPayment(){
         document.getElementById("v_name").innerText=params.get("name");
         document.getElementById("v_upi").innerText=params.get("upi");
         document.getElementById("v_amount").innerText="₹ "+params.get("amount");
-        document.getElementById("txn_id").innerText=params.get("txn");
     }
 }
 
@@ -270,6 +269,15 @@ function copyText(id){
     let text=document.getElementById(id).innerText;
     navigator.clipboard.writeText(text);
     alert("Copied: "+text);
+}
+
+function submitPayment(){
+    let txn=document.getElementById("txn_input").value.trim();
+    if(!txn){
+        alert("Please enter Transaction ID before submitting");
+        return;
+    }
+    alert("Payment Request Submitted!\nTransaction ID: "+txn);
 }
 
 loadPayment();
